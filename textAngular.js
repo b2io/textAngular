@@ -263,6 +263,7 @@ textAngular.directive("textAngular", ['$compile', '$window', '$document', '$root
 				html: angular.element("<textarea ng-show='showHtml' ta-bind='html' ng-model='html' ></textarea>"),
 				text: angular.element("<div contentEditable='true' ng-hide='showHtml' ta-bind='text' ng-model='text' ></div>")
 			};
+
 			// add the main elements to the origional element
 			element.append(scope.displayElements.toolbar);
 			element.append(scope.displayElements.text);
@@ -286,7 +287,14 @@ textAngular.directive("textAngular", ['$compile', '$window', '$document', '$root
 					}
 				});
 			}
-			
+
+      // Set placeholder attribute if it exists.
+      if (!!attrs.placeholder){
+        scope.displayElements.html.attr('placeholder', attrs.placeholder);
+        // TODO: Set the text element.
+        scope.displayElements.text.append("<span class='placeholder-text'>test</span>");
+      }
+
 			// compile the scope with the text and html elements only - if we do this with the main element it causes a compile loop
 			$compile(scope.displayElements.text)(scope);
 			$compile(scope.displayElements.html)(scope);
@@ -296,8 +304,8 @@ textAngular.directive("textAngular", ['$compile', '$window', '$document', '$root
 			scope.displayElements.toolbar.addClass("ta-toolbar " + scope.classes.toolbar);
 			scope.displayElements.text.addClass("ta-text ta-editor " + scope.classes.textEditor);
 			scope.displayElements.html.addClass("ta-html ta-editor " + scope.classes.textEditor);
-			
-			// note that focusout > focusin is called everytime we click a button
+
+      // note that focusout > focusin is called everytime we click a button
 			element.on('focusin', function(){ // cascades to displayElements.text and displayElements.html automatically.
 				element.addClass(scope.classes.focussed);
 				$timeout(function(){
@@ -494,7 +502,7 @@ textAngular.directive("textAngular", ['$compile', '$window', '$document', '$root
 					else element.val(val); // only for input and textarea inputs
 				}else if(!isContentEditable) element.val(val); // only for input and textarea inputs
 			};
-			
+
 			if(!!attrs.taReadonly){
 				//set initial value
 				if(scope.$parent.$eval(attrs.taReadonly)){ // we changed to readOnly mode (taReadonly='true')
